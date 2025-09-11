@@ -15,6 +15,9 @@
       python = {
         path = ./templates/python;
       };
+      rust = {
+        path = ./templates/rust;
+      };
     };
   };
 }
