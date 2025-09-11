@@ -29,30 +29,31 @@
             PYBIN="${python}/bin/python"
 
             if [[ ! -f pyproject.toml ]]; then
-              echo "[uv] No pyproject.toml found — initializing project with uv"
+              echo "[uv] no pyproject.toml → initializing"
               uv init --python "$PYBIN"
-              # Optionally pin tools as dev deps on first init:
-              # uv add --dev pyright ruff
             fi
 
-            # Create/ensure project-local venv using the Nix Python
             if [[ ! -d "$VENV_DIR" ]]; then
               echo "[uv] creating $VENV_DIR with $("$PYBIN" -V)"
               uv venv --python "$PYBIN" "$VENV_DIR"
             fi
 
-            # Prefer the project venv binaries
             export VIRTUAL_ENV="$PWD/$VENV_DIR"
             export PATH="$VIRTUAL_ENV/bin:$PATH"
 
-            # Sync deps (use --frozen if you want to require an existing lock)
             if [[ -f uv.lock ]]; then
+              echo "[uv] syncing (frozen)"
               uv sync --frozen || uv sync
-            else
+            elif [[ -f requirements.txt ]]; then
+              echo "[uv] installing from requirements.txt"
+              uv pip install -r requirements.txt
+              uv lock
+            elif [[ -f pyproject.toml ]]; then
+              echo "[uv] syncing from pyproject.toml"
               uv sync
             fi
 
-            echo "[uv] ready → $(python -V) | $(uv --version | head -n1)"
+            echo "[uv] ready → $(command -v python) → $(python -V)"
           '';
         };
       }
