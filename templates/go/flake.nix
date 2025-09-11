@@ -1,6 +1,4 @@
 {
-  description = "Go application with Swagger";
-
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
     flake-utils.url = "github:numtide/flake-utils";
@@ -15,25 +13,24 @@
       system: let
         pkgs = import nixpkgs {inherit system;};
 
-        go-migrate-pg = pkgs.go-migrate.overrideAttrs (oldAttrs: {
-          tags = ["postgres"];
-        });
+        # go-migrate-pg = pkgs.go-migrate.overrideAttrs (oldAttrs: {
+        #   tags = ["postgres"];
+        # });
 
-        # Custom swag package for the specific version
-        swag = pkgs.buildGoModule rec {
-          pname = "swag";
-          version = "v2.0.0-rc4";
+        # swag = pkgs.buildGoModule rec {
+        #   pname = "swag";
+        #   version = "v2.0.0-rc4";
 
-          src = pkgs.fetchFromGitHub {
-            owner = "swaggo";
-            repo = "swag";
-            rev = version;
-            sha256 = "sha256-3dX01PAVEkn8ciVNbIn1IwiSkwogPJLYNo6xTg9jhDA=";
-          };
+        #   src = pkgs.fetchFromGitHub {
+        #     owner = "swaggo";
+        #     repo = "swag";
+        #     rev = version;
+        #     sha256 = "sha256-3dX01PAVEkn8ciVNbIn1IwiSkwogPJLYNo6xTg9jhDA=";
+        #   };
 
-          vendorHash = "sha256-bUMW9wjPIT3JLMw9F/NvWqZv1M62o/Y4gIpp6XyHbek=";
-          subPackages = ["cmd/swag"];
-        };
+        #   vendorHash = "sha256-bUMW9wjPIT3JLMw9F/NvWqZv1M62o/Y4gIpp6XyHbek=";
+        #   subPackages = ["cmd/swag"];
+        # };
 
         app = pkgs.buildGoModule {
           pname = "go-app";
@@ -43,11 +40,13 @@
 
           vendorHash = "sha256-jx70HhXLbBt63Vt0iZK8aUwoQnpe57MIjUMzXsnaRgA=";
 
-          nativeBuildInputs = [swag];
+          nativeBuildInputs = [
+            # swag
+          ];
 
           preBuild = ''
             # Generate Swagger docs
-            swag init -v3.1 -o docs -g main.go --parseDependency --parseInternal
+            # swag init -v3.1 -o docs -g main.go --parseDependency --parseInternal
           '';
 
           meta = with pkgs.lib; {
@@ -64,13 +63,15 @@
         devShells.default = pkgs.mkShell {
           buildInputs = with pkgs; [
             go_1_24
-            swag
-            air
+            gopls
             golangci-lint
 
-            sqlc
-            go-migrate-pg
-            sql-formatter
+            air
+            # swag
+
+            # sqlc
+            # go-migrate-pg
+            # sql-formatter
 
             pre-commit
           ];
@@ -78,7 +79,7 @@
           shellHook = ''
             echo "Go development environment ready"
             echo "Go version: $(go version)"
-            echo "Swag version: $(swag --version)"
+            # echo "Swag version: $(swag --version)"
           '';
         };
       }
