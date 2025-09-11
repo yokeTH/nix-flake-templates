@@ -22,7 +22,7 @@
             pkgs.ruff
           ];
 
-          postShellHook = ''
+          shellHook = ''
             set -euo pipefail
 
             VENV_DIR=".venv"
