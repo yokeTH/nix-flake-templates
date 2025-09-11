@@ -9,6 +9,12 @@
       go = {
         path = ./templates/go;
       };
+      node = {
+        path = ./templates/node;
+      };
+      python = {
+        path = ./templates/python;
+      };
     };
   };
 }
